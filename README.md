@@ -4,7 +4,7 @@ Template of some commonly used algorithms
 
 ## content
 
-- sorting
+- sort
     - [x] quick sort
     - [x] heap sort
     - [x] merge sort
