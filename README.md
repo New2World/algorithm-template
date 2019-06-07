@@ -13,8 +13,7 @@ Template of some commonly used algorithms
     - [x] bubble sort
     - [x] shell sort
 - tree
-    - [x] binary tree
-    - [ ] AVL tree
+    - [x] AVL tree
     - [ ] red-black tree
     - [ ] splay tree
     - [ ] segment tree
