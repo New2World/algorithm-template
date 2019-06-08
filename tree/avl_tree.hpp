@@ -16,6 +16,7 @@ class AVLTree{
             if(rchild)  return rchild->h;
             return 0;
         }
+        friend void __setValue(_AVL_Node *, int );
     public:
         _AVL_Node *parent, *lchild, *rchild;
 
@@ -65,6 +66,19 @@ class AVLTree{
         return d;
     }
 
+    _AVL_Node *__locate(int v, _AVL_Node *d){
+        if(!d)  return nullptr;
+        if(d->get() == v)   return d;
+        if(d->get() <= v)    return __locate(v, d->rchild);
+        return __locate(v, d->lchild);
+    }
+
+    _AVL_Node *__maxLeaf(_AVL_Node *d){
+        if(!d)  return nullptr;
+        if(d->rchild)   return __maxLeaf(d->rchild);
+        return d;
+    }
+
     void __leftRotate(_AVL_Node *d){
         _AVL_Node *p = d->rchild;
         if(p->lchild)
@@ -101,26 +115,58 @@ class AVLTree{
         p->__updateHeight();
     }
 
-    void __update(_AVL_Node *d, int val){
+    void __update(_AVL_Node *d, int val, bool deletion=false){
         if(!d)   return;
         d->__updateHeight();
         int diff = d->balance();
-        _AVL_Node *rotate = d->get()>val?d->lchild:d->rchild;
-        int subdiff = rotate->balance();
-        if(diff > 1){
-            if(subdiff < 0){
-                __leftRotate(rotate);
-                __rightRotate(d);
-            } else   __rightRotate(d);
+        _AVL_Node *rotate = nullptr;
+        if(deletion){
+            int lh = 0, rh = 0;
+            if(d->lchild)   lh = d->lchild->height();
+            if(d->rchild)   rh = d->rchild->height();
+            rotate = lh>=rh?d->lchild:d->rchild;
         }
-        else if(diff < -1){
-            if(subdiff < 0) __leftRotate(d);
-            else{
-                __rightRotate(rotate);
-                __leftRotate(d);
+        else    rotate = d->get()>val?d->lchild:d->rchild;
+        if(rotate){
+            int subdiff = rotate->balance();
+            if(diff > 1){
+                if(subdiff < 0){
+                    __leftRotate(rotate);
+                    __rightRotate(d);
+                } else   __rightRotate(d);
+            }
+            else if(diff < -1){
+                if(subdiff < 0) __leftRotate(d);
+                else{
+                    __rightRotate(rotate);
+                    __leftRotate(d);
+                }
             }
         }
         __update(d->parent, val);
+    }
+
+    friend void __setValue(_AVL_Node *d, int v){d->v = v;}
+
+    void __remove(_AVL_Node *d, int val){
+        _AVL_Node *node = __locate(val, d), *child = nullptr, *parent = nullptr;
+        if(!node)   return;
+        parent = node->parent;
+        if(!node->lchild || !node->rchild){
+            child = node->lchild?node->lchild:node->rchild;
+            if(parent){
+                if(parent->lchild == node)    parent->lchild = child;
+                else    parent->rchild = child;
+            }
+            if(child)   child->parent = parent;
+            delete node;
+            node = child;
+        } else {
+            child = __maxLeaf(node->lchild);
+            __setValue(node, child->get());
+            __remove(node->lchild, child->get());
+        }
+        if(parent)  __update(parent, 0, true);
     }
 
     void __printStat(_AVL_Node *d){
@@ -130,6 +176,14 @@ class AVLTree{
         if(d->rchild)   rh = d->rchild->height();
         std::cout << "=========================" << std::endl;
         std::cout << "value:            " << d->get() << std::endl;
+        if(d->lchild)
+            std::cout << "|- left child:    " << d->lchild->get() << std::endl;
+        else
+            std::cout << "|- left child:    null" << std::endl;
+        if(d->rchild)
+            std::cout << "|- right child:   " << d->rchild->get() << std::endl;
+        else
+            std::cout << "|- right child:   null" << std::endl;
         std::cout << "height:           " << d->height() << std::endl;
         std::cout << "|- left height:   " << lh << std::endl;
         std::cout << "|- right height:  " << rh << std::endl;
@@ -161,6 +215,10 @@ public:
         else
             d->rchild = node;
         __update(d, val);
+    }
+
+    void remove(int val){
+        __remove(root, val);
     }
 
     void printStat(){
