@@ -5,18 +5,19 @@ class SegmentTree{
         int v, _min, _max, _pending;
         bool leaf;
 
-        friend void __setValue(_Seg_Node *, int);
-        friend void __setDiff(_Seg_Node *, int);
-        friend void __setLeaf(_Seg_Node *);
-        friend void __clearDiff(_Seg_Node *);
     public:
-        _Seg_Node *parent, *lchild, *rchild;
+        _Seg_Node *lchild, *rchild;
 
-        _Seg_Node(int l, int r):
-        v(0), _min(l), _max(r), _pending(0), parent(nullptr), lchild(nullptr), rchild(nullptr), leaf(false){}
-        _Seg_Node(const _Seg_Node &node):
-        v(node.v), _max(node._max), _min(node._min), _pending(node._pending), parent(nullptr), lchild(nullptr), rchild(nullptr), leaf(node.leaf){}
+        _Seg_Node(int v, int l, int r):
+        v(v), _min(l), _max(r), _pending(0), lchild(nullptr), rchild(nullptr), leaf(false){}
+        _Seg_Node(const _Seg_Node &node)=delete;
+        ~_Seg_Node()=default;
+        _Seg_Node &operator = (const _Seg_Node &)=delete;
 
+        void __setValue(int v){this->v = v;}
+        void __setDiff(int v){this->_pending += v;}
+        void __setLeaf(){this->leaf = true;}
+        void __clearDiff(){this->_pending = 0;}
         int getMax() const {return _max;}
         int getMin() const {return _min;}
         int getDiff() const {return _pending;}
@@ -24,20 +25,16 @@ class SegmentTree{
         bool isLeaf() const {return leaf;}
     };
 
-    friend void __setValue(_Seg_Node *d, int v){if(d)   d->v = v;}
-    friend void __setDiff(_Seg_Node *d, int v){if(d)    d->_pending += v;}
-    friend void __setLeaf(_Seg_Node *d){if(d)   d->leaf = true;}
-    friend void __clearDiff(_Seg_Node *d){if(d) d->_pending = 0;}
-
     int length;
     _Seg_Node *root;
 
-    _Seg_Node *__copyTree(const _Seg_Node *d, _Seg_Node *p){
+    _Seg_Node *__copyTree(const _Seg_Node *d){
         if(!d)   return nullptr;
-        _Seg_Node *node = new _Seg_Node(*d);
-        node->parent = p;
-        if(d->lchild)    p->lchild = __copyTree(d->lchild, node);
-        if(d->rchild)    p->rchild = __copyTree(d->rchild, node);
+        _Seg_Node *node = new _Seg_Node(d->get(), d->getMin(), d->getMax());
+        if(d->lchild)
+            node->lchild = __copyTree(d->lchild);
+        if(d->rchild)
+            node->rchild = __copyTree(d->rchild);
         return node;
     }
 
@@ -53,36 +50,32 @@ class SegmentTree{
         int val = 0;
         if(d->lchild)   val += d->lchild->get();
         if(d->rchild)   val += d->rchild->get();
-        __setValue(d, val);
+        d->__setValue(val);
     }
 
     void __pushdown(_Seg_Node *d){
         if(!d)  return;
         if(d->getDiff() == 0)   return;
-        if(d->lchild)   __setDiff(d->lchild, d->getDiff());
-        if(d->rchild)   __setDiff(d->rchild, d->getDiff());
-        __clearDiff(d);
+        if(d->lchild)   d->lchild->__setDiff(d->getDiff());
+        if(d->rchild)   d->rchild->__setDiff(d->getDiff());
+        d->__clearDiff();
     }
 
     _Seg_Node *__buildTree(int *arr, int l, int r){
         if(l > r)   return nullptr;
-        _Seg_Node *node = new _Seg_Node(l, r);
+        _Seg_Node *node = new _Seg_Node(0, l, r);
         if(r == l){
-            __setValue(node, arr[l]);
-            __setLeaf(node);
+            node->__setValue(arr[l]);
+            node->__setLeaf();
         } else {
             int mid = (l+r)>>1, val = 0;
             node->lchild = __buildTree(arr, l, mid);
             node->rchild = __buildTree(arr, mid+1, r);
-            if(node->lchild){
-                node->lchild->parent = node;
+            if(node->lchild)
                 val += node->lchild->get();
-            }
-            if(node->rchild){
-                node->rchild->parent = node;
+            if(node->rchild)
                 val += node->rchild->get();
-            }
-            __setValue(node, val);
+            node->__setValue(val);
         }
         return node;
     }
@@ -91,7 +84,7 @@ class SegmentTree{
         if(!d)  return;
         if(d->getDiff()){
             int val = (d->getMax()-d->getMin()+1)*d->getDiff()+d->get();
-            __setValue(d, val);
+            d->__setValue(val);
         }
         __pushdown(d);
         if(d->lchild)   __modify(d->lchild, l, d->lchild->getMax());
@@ -116,7 +109,7 @@ class SegmentTree{
     void __modifyLazy(_Seg_Node *d, int l, int r, int diff){
         if(!d)  return;
         int mid = (d->getMin()+d->getMax())>>1;
-        if(l == d->getMin() && r == d->getMax())    __setDiff(d, diff);
+        if(l == d->getMin() && r == d->getMax())    d->__setDiff(diff);
         else if(r <= mid)   __modifyLazy(d->lchild, l, r, diff);
         else if(l > mid)    __modifyLazy(d->rchild, l, r, diff);
         else{
@@ -127,7 +120,11 @@ class SegmentTree{
 public:
     SegmentTree():length(0), root(nullptr){}
     SegmentTree(int *arr, int n){buildTree(arr, n);}
-    SegmentTree(const SegmentTree &tree){length = tree.length;root = __copyTree(tree.root, nullptr);}
+    SegmentTree(const SegmentTree &tree){
+        length = tree.length;
+        root = __copyTree(tree.root);
+    }
+    ~SegmentTree(){__deleteTree(root);}
 
     void buildTree(int *arr, int n){length = n;root = __buildTree(arr, 0, n-1);}
     int query(int l, int r){

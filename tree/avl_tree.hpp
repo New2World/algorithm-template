@@ -16,18 +16,18 @@ class AVLTree{
             if(rchild)  return rchild->h;
             return 0;
         }
-        friend void __setValue(_AVL_Node *, int );
     public:
         _AVL_Node *parent, *lchild, *rchild;
 
-        _AVL_Node():
-        h(1), parent(nullptr), lchild(nullptr), rchild(nullptr){}
-        _AVL_Node(int v):v(v){_AVL_Node();}
-        _AVL_Node(int v, int h, _AVL_Node *t):
-        v(v), h(h), parent(t), lchild(nullptr), rchild(nullptr){}
+        _AVL_Node(int v):
+        v(v), h(1), parent(nullptr), lchild(nullptr), rchild(nullptr){}
+        _AVL_Node(int v, int h):
+        v(v), h(h), parent(nullptr), lchild(nullptr), rchild(nullptr){}
         _AVL_Node(const _AVL_Node &)=delete;
+        ~_AVL_Node()=default;
         _AVL_Node &operator = (const _AVL_Node &)=delete;
 
+        void __setValue(int v){this->v = v;};
         inline int get() const {return v;}
         inline int height() const {return h;}
         inline int balance() const {return __lheight()-__rheight();}
@@ -39,11 +39,17 @@ class AVLTree{
 
     _AVL_Node *root;
 
-    _AVL_Node *__copyTree(const _AVL_Node *d, _AVL_Node *p){
+    _AVL_Node *__copyTree(const _AVL_Node *d){
         if(!d)   return nullptr;
-        _AVL_Node *node = new _AVL_Node(d->get(), d->height(), p);
-        if(d->lchild)    p->lchild = __copyTree(d->lchild, node);
-        if(d->rchild)    p->rchild = __copyTree(d->rchild, node);
+        _AVL_Node *node = new _AVL_Node(d->get(), d->height());
+        if(d->lchild){
+            node->lchild = __copyTree(d->lchild);
+            node->lchild->parent = node;
+        }
+        if(d->rchild){
+            node->rchild = __copyTree(d->rchild);
+            node->rchild->parent = node;
+        }
         return node;
     }
 
@@ -54,18 +60,18 @@ class AVLTree{
         delete d;
     }
 
-    _AVL_Node *__find(int v, _AVL_Node *d){
+    _AVL_Node *__find(_AVL_Node *d, int v){
         if(!d)  return d;
-        if(d->get() <= v && d->rchild)  return __find(v, d->rchild);
-        if(d->get() > v && d->lchild)   return __find(v, d->lchild);
+        if(d->get() <= v && d->rchild)  return __find(d->rchild, v);
+        if(d->get() > v && d->lchild)   return __find(d->lchild, v);
         return d;
     }
 
-    _AVL_Node *__locate(int v, _AVL_Node *d){
+    _AVL_Node *__locate(_AVL_Node *d, int v){
         if(!d)  return nullptr;
         if(d->get() == v)   return d;
-        if(d->get() <= v)    return __locate(v, d->rchild);
-        return __locate(v, d->lchild);
+        if(d->get() <= v)    return __locate(d->rchild, v);
+        return __locate(d->lchild, v);
     }
 
     _AVL_Node *__maxLeaf(_AVL_Node *d){
@@ -141,10 +147,8 @@ class AVLTree{
         __update(d->parent, val);
     }
 
-    friend void __setValue(_AVL_Node *d, int v){d->v = v;}
-
     void __remove(_AVL_Node *d, int val){
-        _AVL_Node *node = __locate(val, d), *child = nullptr, *parent = nullptr;
+        _AVL_Node *node = __locate(d, val), *child = nullptr, *parent = nullptr;
         if(!node)   return;
         parent = node->parent;
         if(!node->lchild || !node->rchild){
@@ -158,13 +162,13 @@ class AVLTree{
             node = child;
         } else {
             child = __maxLeaf(node->lchild);
-            __setValue(node, child->get());
+            node->__setValue(child->get());
             __remove(node->lchild, child->get());
         }
         if(parent)  __update(parent, 0, true);
     }
 
-    void __printStat(_AVL_Node *d){
+    static void __printStat(_AVL_Node *d){
         if(!d)  return;
         int lh = 0, rh = 0;
         if(d->lchild)   lh = d->lchild->height();
@@ -185,26 +189,25 @@ class AVLTree{
         std::cout << "=========================" << std::endl;
     }
 
-    void __inorder(_AVL_Node *d){
+    void __inorder(_AVL_Node *d, void (*fn)(_AVL_Node *)){
         if(!d)  return;
-        __inorder(d->lchild);
-        __printStat(d);
-        __inorder(d->rchild);
+        __inorder(d->lchild, fn);
+        fn(d);
+        __inorder(d->rchild, fn);
     }
 public:
     AVLTree():root(nullptr){}
-    AVLTree(const AVLTree &tree){root = __copyTree(tree.root, nullptr);}
-    ~AVLTree(){
-        __deleteTree(root);
-    }
+    AVLTree(const AVLTree &tree){root = __copyTree(tree.root);}
+    ~AVLTree(){__deleteTree(root);}
 
     void insert(int val){
         if(!root){
             root = new _AVL_Node(val);
             return;
         }
-        _AVL_Node *d = __find(val, root);
-        _AVL_Node *node = new _AVL_Node(val, 1, d);
+        _AVL_Node *d = __find(root, val);
+        _AVL_Node *node = new _AVL_Node(val, 1);
+        node->parent = d;
         if(d->get() > val)
             d->lchild = node;
         else
@@ -217,6 +220,6 @@ public:
     }
 
     void printStat(){
-        __inorder(root);
+        __inorder(root, AVLTree::__printStat);
     }
 };
