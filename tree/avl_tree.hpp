@@ -31,12 +31,7 @@ class AVLTree{
         inline int get() const {return v;}
         inline int height() const {return h;}
         inline int balance() const {return __lheight()-__rheight();}
-        void stat(int &v, int &h, int &lh, int &rh){
-            v = this->v;
-            h = this->h;
-            lh = __lheight();
-            rh = __rheight();
-        }
+
         void __updateHeight(){
             h = std::max(__lheight(),__rheight())+1;
         }
