@@ -1,7 +1,5 @@
 #pragma once
 
-#include <iostream>
-
 class SegmentTree{
     class _Seg_Node{
         int v, _min, _max, _pending;
