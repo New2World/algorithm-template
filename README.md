@@ -15,8 +15,8 @@ Template of some commonly used algorithms
 - tree
     - [x] AVL tree
     - [ ] red-black tree
-    - [ ] splay tree
-    - [ ] segment tree
+    - [x] splay tree
+    - [x] segment tree
 - graph
     - [ ] BFS/DFS
     - [ ] shortest path
