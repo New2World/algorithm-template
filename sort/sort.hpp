@@ -45,22 +45,6 @@ void heapSort(int *arr, int n){
 		makeHeap(arr+i, n-i);
 }
 
-void merge(int *arr1, int *arr2, int head, int tail, int half){
-	int count = head;
-	int temp_start = head;
-	int temp_half = half;
-	while(count <= tail){
-		if(temp_start <= half && temp_half <= tail)
-			arr2[count++] = arr1[temp_start] < arr1[temp_half+1] ? arr1[temp_start++] : arr1[temp_half++ + 1];
-		else if(temp_start > half)
-			arr2[count++] = arr1[temp_half++ +1];
-		else if(temp_half > tail)
-			arr2[count++] = arr1[temp_start++];
-	}
-	for(count = head;count <= tail;count++)
-		arr1[count] = arr2[count];
-}
-
 void __merge(int *arr, int n, int mid){
 	int m_arr[n];
 	memcpy(m_arr, arr, sizeof(m_arr));
