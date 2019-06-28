@@ -1,23 +1,32 @@
 #pragma once
 
-class SegmentTree{
+#include "basic_tree.hpp"
+
+class SegmentTree: public BasicTree{
     class _Seg_Node{
         int v, _min, _max, _pending;
         bool leaf;
 
     public:
-        _Seg_Node *lchild, *rchild;
+        _Seg_Node *parent, *lchild, *rchild;
 
         _Seg_Node(int v, int l, int r):
         v(v), _min(l), _max(r), _pending(0), lchild(nullptr), rchild(nullptr), leaf(false){}
-        _Seg_Node(const _Seg_Node &node)=delete;
+        _Seg_Node(const _Seg_Node &node){
+            lchild = rchild = nullptr;
+            v = node.v;
+            _min = node._min;
+            _max = node._max;
+            _pending = node._pending;
+            leaf = node.leaf;
+        }
         ~_Seg_Node()=default;
         _Seg_Node &operator = (const _Seg_Node &)=delete;
 
-        void __setValue(int v){this->v = v;}
-        void __setDiff(int v){this->_pending += v;}
-        void __setLeaf(){this->leaf = true;}
-        void __clearDiff(){this->_pending = 0;}
+        void _setValue(int v){this->v = v;}
+        void _setDiff(int v){this->_pending += v;}
+        void _setLeaf(){this->leaf = true;}
+        void _clearDiff(){this->_pending = 0;}
         int getMax() const {return _max;}
         int getMin() const {return _min;}
         int getDiff() const {return _pending;}
@@ -28,45 +37,28 @@ class SegmentTree{
     int length;
     _Seg_Node *root;
 
-    _Seg_Node *__copyTree(const _Seg_Node *d){
-        if(!d)   return nullptr;
-        _Seg_Node *node = new _Seg_Node(d->get(), d->getMin(), d->getMax());
-        if(d->lchild)
-            node->lchild = __copyTree(d->lchild);
-        if(d->rchild)
-            node->rchild = __copyTree(d->rchild);
-        return node;
-    }
-
-    void __deleteTree(_Seg_Node *d){
-        if(!d)  return;
-        __deleteTree(d->lchild);
-        __deleteTree(d->rchild);
-        delete d;
-    }
-
     void __update(_Seg_Node *d){
         if(!d || (d->getMin() == d->getMax()))  return;
         int val = 0;
         if(d->lchild)   val += d->lchild->get();
         if(d->rchild)   val += d->rchild->get();
-        d->__setValue(val);
+        d->_setValue(val);
     }
 
     void __pushdown(_Seg_Node *d){
         if(!d)  return;
         if(d->getDiff() == 0)   return;
-        if(d->lchild)   d->lchild->__setDiff(d->getDiff());
-        if(d->rchild)   d->rchild->__setDiff(d->getDiff());
-        d->__clearDiff();
+        if(d->lchild)   d->lchild->_setDiff(d->getDiff());
+        if(d->rchild)   d->rchild->_setDiff(d->getDiff());
+        d->_clearDiff();
     }
 
     _Seg_Node *__buildTree(int *arr, int l, int r){
         if(l > r)   return nullptr;
         _Seg_Node *node = new _Seg_Node(0, l, r);
         if(r == l){
-            node->__setValue(arr[l]);
-            node->__setLeaf();
+            node->_setValue(arr[l]);
+            node->_setLeaf();
         } else {
             int mid = (l+r)>>1, val = 0;
             node->lchild = __buildTree(arr, l, mid);
@@ -75,7 +67,7 @@ class SegmentTree{
                 val += node->lchild->get();
             if(node->rchild)
                 val += node->rchild->get();
-            node->__setValue(val);
+            node->_setValue(val);
         }
         return node;
     }
@@ -84,7 +76,7 @@ class SegmentTree{
         if(!d)  return;
         if(d->getDiff()){
             int val = (d->getMax()-d->getMin()+1)*d->getDiff()+d->get();
-            d->__setValue(val);
+            d->_setValue(val);
         }
         __pushdown(d);
         if(d->lchild)   __modify(d->lchild, l, d->lchild->getMax());
@@ -109,7 +101,7 @@ class SegmentTree{
     void __modifyLazy(_Seg_Node *d, int l, int r, int diff){
         if(!d)  return;
         int mid = (d->getMin()+d->getMax())>>1;
-        if(l == d->getMin() && r == d->getMax())    d->__setDiff(diff);
+        if(l == d->getMin() && r == d->getMax())    d->_setDiff(diff);
         else if(r <= mid)   __modifyLazy(d->lchild, l, r, diff);
         else if(l > mid)    __modifyLazy(d->rchild, l, r, diff);
         else{
@@ -118,7 +110,7 @@ class SegmentTree{
         }
     }
 public:
-    SegmentTree():length(0), root(nullptr){}
+    SegmentTree():BasicTree(), length(0), root(nullptr){}
     SegmentTree(int *arr, int n){buildTree(arr, n);}
     SegmentTree(const SegmentTree &tree){
         length = tree.length;

@@ -3,8 +3,9 @@
 #include <iostream>
 #include <algorithm>
 
+#include "basic_tree.hpp"
 
-class AVLTree{
+class AVLTree: public BasicTree{
     class _AVL_Node{
         int v, h;
 
@@ -23,42 +24,25 @@ class AVLTree{
         v(v), h(1), parent(nullptr), lchild(nullptr), rchild(nullptr){}
         _AVL_Node(int v, int h):
         v(v), h(h), parent(nullptr), lchild(nullptr), rchild(nullptr){}
-        _AVL_Node(const _AVL_Node &)=delete;
+        _AVL_Node(const _AVL_Node &node){
+            parent = lchild = rchild = nullptr;
+            v = node.v;
+            h = node.h;
+        }
         ~_AVL_Node()=default;
         _AVL_Node &operator = (const _AVL_Node &)=delete;
 
-        void __setValue(int v){this->v = v;};
+        void _setValue(int v){this->v = v;};
         inline int get() const {return v;}
         inline int height() const {return h;}
         inline int balance() const {return __lheight()-__rheight();}
 
-        void __updateHeight(){
+        void _updateHeight(){
             h = std::max(__lheight(),__rheight())+1;
         }
     };
 
     _AVL_Node *root;
-
-    _AVL_Node *__copyTree(const _AVL_Node *d){
-        if(!d)   return nullptr;
-        _AVL_Node *node = new _AVL_Node(d->get(), d->height());
-        if(d->lchild){
-            node->lchild = __copyTree(d->lchild);
-            node->lchild->parent = node;
-        }
-        if(d->rchild){
-            node->rchild = __copyTree(d->rchild);
-            node->rchild->parent = node;
-        }
-        return node;
-    }
-
-    void __deleteTree(_AVL_Node *d){
-        if(!d)  return;
-        __deleteTree(d->lchild);
-        __deleteTree(d->rchild);
-        delete d;
-    }
 
     _AVL_Node *__find(_AVL_Node *d, int v){
         if(!d)  return d;
@@ -94,8 +78,8 @@ class AVLTree{
             d->parent->rchild = p;
         p->lchild = d;
         d->parent = p;
-        d->__updateHeight();
-        p->__updateHeight();
+        d->_updateHeight();
+        p->_updateHeight();
     }
 
     void __rightRotate(_AVL_Node *d){
@@ -112,13 +96,13 @@ class AVLTree{
             d->parent->rchild = p;
         p->rchild = d;
         d->parent = p;
-        d->__updateHeight();
-        p->__updateHeight();
+        d->_updateHeight();
+        p->_updateHeight();
     }
 
     void __update(_AVL_Node *d, int val, bool deletion=false){
         if(!d)   return;
-        d->__updateHeight();
+        d->_updateHeight();
         int diff = d->balance();
         _AVL_Node *rotate = nullptr;
         if(deletion){
@@ -162,7 +146,7 @@ class AVLTree{
             node = child;
         } else {
             child = __maxLeaf(node->lchild);
-            node->__setValue(child->get());
+            node->_setValue(child->get());
             __remove(node->lchild, child->get());
         }
         if(parent)  __update(parent, 0, true);
@@ -189,14 +173,8 @@ class AVLTree{
         std::cout << "=========================" << std::endl;
     }
 
-    void __inorder(_AVL_Node *d, void (*fn)(_AVL_Node *)){
-        if(!d)  return;
-        __inorder(d->lchild, fn);
-        fn(d);
-        __inorder(d->rchild, fn);
-    }
 public:
-    AVLTree():root(nullptr){}
+    AVLTree():BasicTree(), root(nullptr){}
     AVLTree(const AVLTree &tree){root = __copyTree(tree.root);}
     ~AVLTree(){__deleteTree(root);}
 
@@ -220,6 +198,6 @@ public:
     }
 
     void printStat(){
-        __inorder(root, AVLTree::__printStat);
+        inorder(root, AVLTree::__printStat);
     }
 };

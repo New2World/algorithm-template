@@ -1,6 +1,8 @@
 #pragma once
 
-class SplayTree{
+#include "basic_tree.hpp"
+
+class SplayTree: public BasicTree{
     class _Sp_Node{
         int v;
     public:
@@ -8,7 +10,10 @@ class SplayTree{
 
         _Sp_Node(int v, _Sp_Node *p=nullptr):
         v(v), parent(p), lchild(nullptr), rchild(nullptr){}
-        _Sp_Node(const _Sp_Node &d)=delete;
+        _Sp_Node(const _Sp_Node &node){
+            parent = lchild = rchild = nullptr;
+            v = node.v;
+        }
         ~_Sp_Node()=default;
         _Sp_Node &operator = (const _Sp_Node &)=delete;
 
@@ -16,27 +21,6 @@ class SplayTree{
     };
 
     _Sp_Node *root;
-
-    _Sp_Node *__copyTree(const _Sp_Node *d){
-        if(!d)   return nullptr;
-        _Sp_Node *node = new _Sp_Node(d->get());
-        if(d->lchild){
-            node->lchild = __copyTree(d->lchild);
-            node->lchild->parent = node;
-        }
-        if(d->rchild){
-            node->rchild = __copyTree(d->rchild);
-            node->rchild->parent = node;
-        }
-        return node;
-    }
-
-    void __deleteTree(_Sp_Node *d){
-        if(!d)  return;
-        __deleteTree(d->lchild);
-        __deleteTree(d->rchild);
-        delete d;
-    }
 
     void __leftRotate(_Sp_Node *d){
         _Sp_Node *p = d->rchild;
@@ -153,15 +137,9 @@ class SplayTree{
         std::cout << "=========================" << std::endl;
     }
 
-    void __inorder(_Sp_Node *d, void (*fn)(_Sp_Node *)){
-        if(!d)  return;
-        __inorder(d->lchild, fn);
-        fn(d);
-        __inorder(d->rchild, fn);
-    }
 public:
 
-    SplayTree():root(nullptr){}
+    SplayTree():BasicTree(), root(nullptr){}
     SplayTree(const SplayTree &tree){root = __copyTree(tree.root);}
     ~SplayTree(){__deleteTree(root);}
 
@@ -184,6 +162,6 @@ public:
     }
 
     void printStat(){
-        __inorder(root, SplayTree::__printStat);
+        inorder(root, SplayTree::__printStat);
     }
 };

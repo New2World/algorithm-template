@@ -3,7 +3,9 @@
 #include <iostream>
 #include <string>
 
-class RBTree{
+#include "basic_tree.hpp"
+
+class RBTree: public BasicTree{
     enum class __color{red, black};
     class _RB_Node{
         int val;
@@ -11,36 +13,28 @@ class RBTree{
     public:
         _RB_Node *parent, *lchild, *rchild;
         _RB_Node(int v, __color c, _RB_Node *p=nullptr):val(v), color(c), parent(p), lchild(nullptr), rchild(nullptr){}
-        _RB_Node(const _RB_Node &)=delete;
+        _RB_Node(const _RB_Node &node){
+            parent = lchild = rchild = nullptr;
+            val = node.val;
+            color = node.color;
+        }
         ~_RB_Node()=default;
         _RB_Node &operator = (const _RB_Node &)=delete;
 
         int get() const {return val;}
+        int setValue(int v){val = v;}
         __color getColor() const {return color;}
         void setColor(__color c){color = c;}
     };
 
     _RB_Node *root;
 
-    _RB_Node *__copyTree(const _RB_Node *d){
-        if(!d)   return nullptr;
-        _RB_Node *node = new _RB_Node(d->get(), d->getColor());
-        if(d->lchild){
-            node->lchild = __copyTree(d->lchild);
-            node->lchild->parent = node;
-        }
-        if(d->rchild){
-            node->rchild = __copyTree(d->rchild);
-            node->rchild->parent = node;
-        }
-        return node;
+    _RB_Node *__maxLeaf(_RB_Node *d){
+        if(!d)  return nullptr;
+        if(d->rchild)   return __maxLeaf(d->rchild);
+        return d;
     }
-    void __deleteTree(_RB_Node *node){
-        if(!node)   return;
-        __deleteTree(node->lchild);
-        __deleteTree(node->rchild);
-        delete node;
-    }
+
     void __leftRotate(_RB_Node *node){
         _RB_Node *ptr = node->rchild;
         if(ptr->lchild) ptr->lchild->parent = node;
@@ -104,6 +98,18 @@ class RBTree{
         }
     }
 
+    void __remove(_RB_Node *d){
+        if(!d)  return;
+        _RB_Node *child = nullptr, *sibling = nullptr;
+        if(d->lchild && d->rchild){
+            child = __maxLeaf(d->lchild);
+            d->setValue(child->get());
+            __remove(child);
+            return;
+        }
+        ;
+    }
+
     _RB_Node *__find(_RB_Node *d, int val){
         if(!d)  return nullptr;
         if(d->get() <= val && d->rchild)
@@ -115,7 +121,6 @@ class RBTree{
 
     static void __printStat(_RB_Node *d){
         if(!d)  return;
-        int lh = 0, rh = 0;
         std::cout << "=========================" << std::endl;
         std::cout << "value: " << d->get() << std::endl;
         if(d->getColor() == __color::red)
@@ -125,14 +130,8 @@ class RBTree{
         std::cout << "=========================" << std::endl;
     }
 
-    void __inorder(_RB_Node *d, void (*fn)(_RB_Node *)){
-        if(!d)  return;
-        __inorder(d->lchild, fn);
-        fn(d);
-        __inorder(d->rchild, fn);
-    }
 public:
-    RBTree():root(nullptr){}
+    RBTree():BasicTree(), root(nullptr){}
     RBTree(const RBTree& tree){root = __copyTree(tree.root);}
     ~RBTree(){__deleteTree(root);};
 
@@ -150,13 +149,14 @@ public:
     void remove(int val){
         _RB_Node *node = __find(root, val);
         if(!node)   return;
-        if( (!node->lchild && !node->rchild) ||
-            (node->lchild && node->lchild->get() != val) ||
-            (node->rchild && node->rchild->get() != val))
-            return;
-        // TODO
+        if(node->get() == val)
+            __remove(node);
+        else if(node->lchild && node->lchild->get() == val)
+            __remove(node->lchild);
+        else if(node->rchild && node->rchild->get() == val)
+            __remove(node->rchild);
     }
     void printStat(){
-        __inorder(root, RBTree::__printStat);
+        inorder(root, RBTree::__printStat);
     }
 };
