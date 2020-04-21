@@ -23,7 +23,6 @@ void quickSort(int *arr, int n){
 }
 
 void __adjustHeap(int *arr, int n, int id){
-	int temp = arr[id];
 	int minChild = H_LCHILD(id);
 	if(minChild >= n)
 		return;
