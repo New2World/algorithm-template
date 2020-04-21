@@ -23,26 +23,34 @@ void quickSort(int *arr, int n){
 }
 
 void __adjustHeap(int *arr, int n, int id){
+	int temp = arr[id];
 	int minChild = H_LCHILD(id);
-	if(minChild >= n)	return;
-	if(H_RCHILD(id) < n && arr[H_RCHILD(id)] < arr[H_LCHILD(id)])
+	if(minChild >= n)
+		return;
+	if(H_RCHILD(id) < n && arr[H_RCHILD(id)] > arr[H_LCHILD(id)])
 		minChild = H_RCHILD(id);
-	if(arr[id] > arr[minChild]){
+	if(arr[id] < arr[minChild]){
 		arr[id] ^= arr[minChild] ^= arr[id] ^= arr[minChild];
 		__adjustHeap(arr, n, minChild);
 	}
 }
 
 void makeHeap(int *arr, int n){
-	if(n <= 1)	return;
+	if(n <= 1)
+		return;
 	for(int i = H_PARENT(n-1);i >= 0;i--)
 		__adjustHeap(arr, n, i);
 }
 
 void heapSort(int *arr, int n){
+	int temp;
 	makeHeap(arr, n);
-	for(int i = 1;i < n;i++)
-		makeHeap(arr+i, n-i);
+	for(int i = n-1;i >= 0;i--){
+		temp = arr[i];
+		arr[i] = arr[0];
+		arr[0] = temp;
+		__adjustHeap(arr, i, 0);
+	}
 }
 
 void __merge(int *arr, int n, int mid){
