@@ -25,7 +25,6 @@ protected:
         delete d;
     }
 
-public:
     template <class _Tree_Node>
     void inorder(_Tree_Node *d, void (*fn)(_Tree_Node *)){
         if(!d)  return;
