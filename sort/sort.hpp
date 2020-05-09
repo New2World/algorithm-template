@@ -1,10 +1,8 @@
 #pragma once
 
-#include <memory.h>
-
-#define H_PARENT(x) ((x-1)/2)
-#define H_LCHILD(x) (2*x+1)
-#define H_RCHILD(x) (2*x+2)
+#define HEAP_PARENT(x) ((x-1)/2)
+#define HEAP_LCHILD(x) (2*x+1)
+#define HEAP_RCHILD(x) (2*x+2)
 
 void quickSort(int *arr, int n){
 	if(n <= 1)	return;
@@ -23,20 +21,20 @@ void quickSort(int *arr, int n){
 }
 
 void __adjustHeap(int *arr, int n, int id){
-	int minChild = H_LCHILD(id);
-	if(minChild >= n)
-		return;
+	int t, minChild = H_LCHILD(id);
+	if(minChild >= n)	return;
 	if(H_RCHILD(id) < n && arr[H_RCHILD(id)] > arr[H_LCHILD(id)])
 		minChild = H_RCHILD(id);
 	if(arr[id] < arr[minChild]){
-		arr[id] ^= arr[minChild] ^= arr[id] ^= arr[minChild];
+		t = arr[minChild];
+		arr[minChild] = arr[id];
+		arr[id] = t;
 		__adjustHeap(arr, n, minChild);
 	}
 }
 
 void makeHeap(int *arr, int n){
-	if(n <= 1)
-		return;
+	if(n <= 1)	return;
 	for(int i = H_PARENT(n-1);i >= 0;i--)
 		__adjustHeap(arr, n, i);
 }
@@ -54,7 +52,8 @@ void heapSort(int *arr, int n){
 
 void __merge(int *arr, int n, int mid){
 	int m_arr[n];
-	memcpy(m_arr, arr, sizeof(m_arr));
+	for(int i = 0;i < n;i++)
+		m_arr[i] = arr[i];
 	int p1 = 0, p2 = mid, p = 0;
 	while(p1 < mid && p2 < n){
 		if(m_arr[p1] <= m_arr[p2])
@@ -70,46 +69,57 @@ void __merge(int *arr, int n, int mid){
 
 void mergeSort(int *arr, int n){
 	if(n <= 1)	return;
+	int t;
 	if(n == 2){
-		if(arr[0] > arr[1])
-			arr[0] ^= arr[1] ^= arr[0] ^= arr[1];
+		if(arr[0] > arr[1]){
+			t = arr[1];
+			arr[1] = arr[0];
+			arr[0] = t;
+		}
 		return;
 	}
-	int mid = n>>1;
+	int mid = n >> 1;
 	mergeSort(arr, mid);
 	mergeSort(arr+mid, n-mid);
 	__merge(arr, n, mid);
 }
 
-void insertSort(int *arr, int n, int d=1){
-	for(int i = d;i < n;i += d)
-		for(int j = i;j > 0;j -= d)
-			if(arr[j] < arr[j-d])
-				arr[j] ^= arr[j-d] ^= arr[j] ^= arr[j-d];
-			else	break;
+void insertSort(int *arr, int n){
+	int t, j;
+	if(n <= 1)	return;
+	for(int i = 1;i < n;i++){
+		t = arr[i];
+		for(j = i;j > 0 && t < arr[j-1];j--)
+			arr[j] = arr[j-1];
+		arr[j] = t;
+	}
 }
 
 void selectSort(int *arr, int n){
 	if(n <= 1)	return;
-	int ptr;
+	int ptr, t;
 	for(int i = 0;i < n;i++){
 		ptr = i;
-		for(int j = i+1;j < n;j++)
-			if(arr[ptr] > arr[j])
+		for(int j = i;j < n;j++)
+			if(arr[j] < arr[ptr])
 				ptr = j;
-		if(ptr-i)
-			arr[i] ^= arr[ptr] ^= arr[i] ^= arr[ptr];
+		t = arr[i];
+		arr[i] = arr[ptr];
+		arr[ptr] = t;
 	}
 }
 
 void bubbleSort(int *arr, int n){
-	bool changed = true;
 	if(n <= 1)	return;
+	int t;
+	bool changed = true;
 	for(int j = 0;changed && j < n;j++){
 		changed = false;
 		for(int i = 1;i < n;i++){
 			if(arr[i-1] > arr[i]){
-				arr[i-1] ^= arr[i] ^= arr[i-1] ^= arr[i];
+				t = arr[i];
+				arr[i] = arr[i-1];
+				arr[i-1] = t;
 				changed = true;
 			}
 		}
@@ -117,7 +127,15 @@ void bubbleSort(int *arr, int n){
 }
 
 void shellSort(int *arr, int n){
-	for(int d = n;d;d >>= 1)
-		for(int i = 0;i < d;i++)
-			insertSort(arr+i, n-i, d);
+	if(n <= 1)	return;
+	int t;
+	for(int d = n/2;d;d >>= 1){
+		for(int i = d;i < n;i++){
+			for(int j = i-d;j >= 0 && arr[j] > arr[j+d];j -= d){
+				t = arr[j];
+				arr[j] = arr[j+d];
+				arr[j+d] = t;
+			}
+		}
+	}
 }
