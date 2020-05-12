@@ -1,3 +1,9 @@
+/*
+
+HDU 1698 - Just a hook
+
+*/
+
 #include <cstdio>
 #include <algorithm>
 
