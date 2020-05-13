@@ -17,6 +17,7 @@ Algorithms for solving ACM/ICPC problems. Instead of writing some templates, whi
     - [x] AVL tree
     - [x] splay tree
     - [x] segment tree
+    - [x] binary indexed tree
     - [ ] red-black tree (hard to implement, under construction...)
 - graph
     - [ ] BFS / DFS

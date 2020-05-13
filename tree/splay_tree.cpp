@@ -1,11 +1,10 @@
 /*
 
-HDU 1890 - Robotic sort
+HDU 1890 - Robotic Sort
 
 */
 
-#include <cstdio>
-#include <algorithm>
+#include <bits/stdc++.h>
 
 #define MAXLEN 10000005
 
@@ -39,9 +38,10 @@ void pushdown(int x){
     int l = son[x][0], r = son[x][1];
     int t;
     if(lazy[x]){
-        lazy[x] = false;
-        lazy[l] ^= true;
-        lazy[r] ^= true;
+        lazy[x] = false;    // 清空当前 lazy 标记
+        lazy[l] ^= true;    // 下放 lazy
+        lazy[r] ^= true;    // 下放 lazy
+        // 更新当前节点：翻转
         t = son[x][0];
         son[x][0] = son[x][1];
         son[x][1] = t;
@@ -58,6 +58,7 @@ void rotate(int x){
     fa[x] = g;
     if(fa[x] >= 0)
         son[g][son[g][0]==f?0:1] = x;
+    // 因为当前节点与父节点的子树改变了，所以需要更新这两个点的信息
     pushup(f);
     pushup(x);
 }
@@ -67,9 +68,13 @@ void splay(int x){
     while(fa[x] >= 0){
         f = fa[x];
         g = fa[f];
+        // 因为需要判断 x 节点相对父节点和祖父节点的位置
+        // zig-zig, zag-zag, zig-zag, zag-zig
+        // 所以要 pushdown 祖父、父以及当前节点
         pushdown(g);
         pushdown(f);
         pushdown(x);
+        // 各种情况的旋转方案以及旋转中心
         if(fa[fa[x]] < 0)
             rotate(x);
         else{
@@ -87,24 +92,27 @@ void splay(int x){
 
 int findmax(int x){
     if(x < 0)   return x;
-    pushdown(x);
+    pushdown(x);        // 先更新翻转信息，才能准确找到真正的最大值
     while(son[x][1] >= 0){
         x = son[x][1];
-        pushdown(x);
+        pushdown(x);    // 道理同上
     }
     return x;
 }
 
 void erase(int x){
     splay(x);
-    int m = findmax(son[x][0]);
+    int m = findmax(son[x][0]); // 找到左子树最大值来作为新的根
     int l = son[x][0], r = son[x][1];
-    if(m < 0){
+    if(m < 0){                  // 没有新的根，直接返回右子树
         fa[r] = -1;
         son[x][1] = -1;
         pushup(r);
     }
     else{
+        // 由于要维护子树的大小，而将新根挪过来需要维护整个左子树
+        // 根据BST的性质，左子树的最大值的右子树一定为空
+        // 因此直接将右子树接在新根的右子树上
         son[m][1] = r;
         fa[r] = m;
         fa[l] = -1;
@@ -119,7 +127,7 @@ int build(int l, int r, int rt=-1){
     fa[m] = rt;
     son[m][0] = build(l, m, m);
     son[m][1] = build(m+1, r, m);
-    pushup(m);
+    pushup(m);          // 自底向上更新节点信息
     return m;
 }
 

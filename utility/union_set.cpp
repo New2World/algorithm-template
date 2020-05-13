@@ -1,14 +1,12 @@
 /*
 
-HDU 1856 - More is better
+HDU 1856 - More is Better
 
 */
 
-#include <cstdio>
+#include <bits/stdc++.h>
 
 #define MAXLEN 10000005
-
-using namespace std;
 
 int parent[MAXLEN], num[MAXLEN];
 
