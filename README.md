@@ -5,22 +5,24 @@ Algorithms for solving ACM/ICPC problems. Instead of writing some templates, whi
 ## Content
 
 - utility
-    - [x] quick sort
-    - [x] heap sort
-    - [x] merge sort
-    - [x] insert sort
-    - [x] select sort
-    - [x] bubble sort
-    - [x] shell sort
+    - [x] sort
+        - quick sort
+        - heap sort
+        - merge sort
+        - insert sort
+        - select sort
+        - bubble sort
+        - shell sort
     - [x] union set
     - [x] leftist heap
     - [x] prime
+    - [x] ST for RMQ
 - tree
     - [x] AVL tree
     - [x] splay tree
     - [x] segment tree
     - [x] binary indexed tree
-    - [ ] red-black tree (hard to implement, under construction...)
+    - [ ] red-black tree (hard to implement, pending...)
 - graph
     - [ ] BFS / DFS
     - [ ] shortest path
@@ -36,7 +38,8 @@ Algorithms for solving ACM/ICPC problems. Instead of writing some templates, whi
     - [ ] bipartite graph matching
     - [ ] topology sort
 - string
-    - [x] KMP
-    - [x] Sunday
+    - [x] matching
+        - KMP
+        - Sunday
     - [ ] Manacher
     - [ ] AC automation
