@@ -13,6 +13,8 @@ Algorithms for solving ACM/ICPC problems. Instead of writing some templates, whi
     - [x] bubble sort
     - [x] shell sort
     - [x] union set
+    - [x] leftist heap
+    - [x] prime
 - tree
     - [x] AVL tree
     - [x] splay tree
