@@ -41,7 +41,7 @@ int erase(int x){
         return -1;
     fa[son[x][0]] = fa[son[x][1]] = -1;
     x = merge(son[x][0], son[x][1]);
-    son[r][0] = son[r][1] = -1; // 因为还要合并这个节点，因此需要清空左右子树
+    son[r][0] = son[r][1] = -1; // 因为还要合并这个节点，所以需要清空左右子树
     return x;
 }
 
