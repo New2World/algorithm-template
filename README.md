@@ -34,8 +34,8 @@ Algorithms for solving ACM/ICPC problems. Instead of writing some templates, whi
         - SAP
     - [ ] minimum spanning tree
         - Kruskal
-        - Prims
-    - [ ] bipartite graph matching
+        - Prim
+    - [x] maximal matching (Hungary)
     - [ ] topology sort
 - string
     - [x] matching
