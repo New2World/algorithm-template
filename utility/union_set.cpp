@@ -18,11 +18,15 @@ int init(){
 }
 
 int getParent(const int &a){
-    int p = a;
-    while(p != parent[p])
-        p = parent[p];
-    parent[a] = p;
-    return p;
+    int root = a, p = a, t;
+    while(root != parent[root])
+        root = parent[root];
+    while(p != parent[p]){
+        t = parent[p];
+        parent[p] = root;
+        p = t;
+    }
+    return root;
 }
 
 int combine(int a, int b){
