@@ -41,5 +41,6 @@ Algorithms for solving ACM/ICPC problems. Instead of writing some templates, whi
     - [x] matching
         - KMP
         - Sunday
+    - [x] Levenshtein distance
     - [ ] Manacher
     - [ ] AC automation
