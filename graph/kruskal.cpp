@@ -1,6 +1,6 @@
 /*
 
-HDU 21863 - 畅通工程
+HDU 1863 - 畅通工程
 
 */
 
@@ -39,15 +39,30 @@ bool duplicate(const int &a, const int &b){
     return false;
 }
 
+int kruskal(int n, int m){
+    int ans = 0, e = 0;
+    int u, v;
+    sort(arr, arr+n);
+    for(int i = 0;i < n;i++){
+        if(i > 0 && duplicate(i-1, i))
+            continue;
+        u = getuni(arr[i].u);
+        v = getuni(arr[i].v);
+        if(u != v){
+            uni[v] = u;
+            ans += arr[i].w;
+            e++;
+        }
+    }
+    return e==m-1?ans:-1;
+}
+
 int main(){
     #ifndef ONLINE_JUDGE
     freopen("test.txt", "r", stdin);
     #endif
     int n, m, u, v, w, ans;
-    int e;
     while(~scanf("%d %d", &n, &m) && n){
-        ans = 0;
-        e = 0;
         for(int i = 0;i <= m;i++)
             uni[i] = i;
         for(int i = 0;i < n;i++){
@@ -56,19 +71,8 @@ int main(){
             arr[i].v = u>v?u:v;
             arr[i].w = w;
         }
-        sort(arr, arr+n);
-        for(int i = 0;i < n;i++){
-            if(i > 0 && duplicate(i-1, i))
-                continue;
-            u = getuni(arr[i].u);
-            v = getuni(arr[i].v);
-            if(u != v){
-                uni[v] = u;
-                ans += arr[i].w;
-                e++;
-            }
-        }
-        printf(e!=m-1?"?\n":"%d\n", ans);
+        ans = kruskal(n, m);
+        printf(ans<0?"?\n":"%d\n", ans);
     }
     return 0;
 }
