@@ -32,7 +32,7 @@ Algorithms for solving ACM/ICPC problems. Instead of writing some templates, whi
         - Ford-Fulkerson
         - Dinic
         - SAP
-    - [ ] minimum spanning tree
+    - [x] minimum spanning tree
         - Kruskal
         - Prim
     - [x] maximal matching (Hungary)
