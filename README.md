@@ -33,8 +33,8 @@ Algorithms for solving ACM/ICPC problems. Instead of writing some templates, whi
         - Dinic
         - SAP
     - [x] minimum spanning tree
-        - Kruskal
-        - Prim
+        - Kruskal (sparse)
+        - Prim (dense)
     - [x] maximal matching (Hungary)
     - [ ] topology sort
 - string
