@@ -24,7 +24,7 @@ Algorithms for solving ACM/ICPC problems. Instead of writing some templates, whi
     - [x] binary indexed tree
     - [ ] red-black tree (hard to implement, pending...)
 - graph
-    - [ ] BFS / DFS
+    - [x] BFS / DFS
     - [ ] shortest path
         - Dijkstra
         - SPFA
