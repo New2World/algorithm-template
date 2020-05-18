@@ -1,9 +1,6 @@
 /*
 
-HDU 1863 - 畅通工程
-
-在 HDU 1879 中，部分节点已经连接。
-此时再做 MST 的话只需将已连接的节点间的 cost 更改为 0 即可。
+HDU 1879 - 继续畅通工程
 
 */
 
@@ -23,17 +20,16 @@ typedef struct _edge {
 } edge;
 
 int graph[MAXLEN][MAXLEN][2];
-int neigh[MAXLEN];
 
-int prim(int n, int m, int st){
+int prim(int n){
     set<int> mst;
     priority_queue<edge> pq;
     edge e;
     int ans = 0;
-    mst.insert(st);
-    for(int i = 0;i < neigh[st];i++)
-        pq.push(edge(graph[st][i][0], graph[st][i][1]));
-    for(int i = 0;!pq.empty() && mst.size() < m;i++){
+    mst.insert(1);
+    for(int i = 0;i < neigh[1];i++)
+        pq.push(edge(graph[1][i][0], graph[1][i][1]));
+    for(int i = 0;!pq.empty() && mst.size() < n;i++){
         e = pq.top();
         pq.pop();
         if(mst.find(e.v) != mst.end())
@@ -44,25 +40,26 @@ int prim(int n, int m, int st){
             if(mst.find(graph[e.v][j][0]) == mst.end())
                 pq.push(edge(graph[e.v][j][0], graph[e.v][j][1]));
     }
-    return mst.size()==m?ans:-1;
+    return ans;
 }
 
 int main(){
     #ifndef ONLINE_JUDGE
     freopen("test.txt", "r", stdin);
     #endif
-    int n, m, u, v, w, ans;
-    while(~scanf("%d %d", &n, &m) && n){
+    int n, m, u, v, w, c;
+    while(~scanf("%d", &n) && n){
+        m = n*(n-1)/2;
         memset(neigh, 0, sizeof(neigh));
-        for(int i = 0;i < n;i++){
-            scanf("%d %d %d", &u, &v, &w);
+        for(int i = 0;i < m;i++){
+            scanf("%d %d %d %d", &u, &v, &w, &c);
+            if(c)   w = 0;                  // 将已连接的节点间的 cost 更改为 0 即可
             graph[u][neigh[u]][0] = v;
             graph[u][neigh[u]++][1] = w;
             graph[v][neigh[v]][0] = u;
             graph[v][neigh[v]++][1] = w;
         }
-        ans = prim(n, m, u);
-        printf(ans<0?"?\n":"%d\n", ans);
+        printf("%d\n", prim(n));
     }
     return 0;
 }
