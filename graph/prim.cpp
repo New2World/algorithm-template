@@ -30,7 +30,7 @@ int prim(int n){
     for(int i = 0;i < neigh[1];i++)
         pq.push(edge(graph[1][i][0], graph[1][i][1]));
     for(int i = 0;!pq.empty() && mst.size() < n;i++){
-        e = pq.top();
+        e = pq.top();                       // 取目前 fringe 中最短的节点
         pq.pop();
         if(mst.find(e.v) != mst.end())
             continue;
@@ -38,7 +38,7 @@ int prim(int n){
         ans += e.w;
         for(int j = 0;j < neigh[e.v];j++)
             if(mst.find(graph[e.v][j][0]) == mst.end())
-                pq.push(edge(graph[e.v][j][0], graph[e.v][j][1]));
+                pq.push(edge(graph[e.v][j][0], graph[e.v][j][1]));      // 每次加入为加入过的最近的节点
     }
     return ans;
 }
