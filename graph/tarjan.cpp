@@ -1,3 +1,9 @@
+/*
+
+HDU 1269 - 迷宫城堡
+
+*/
+
 #include <bits/stdc++.h>
 
 #define MAXLEN 10001
