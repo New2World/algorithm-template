@@ -21,11 +21,11 @@ typedef struct _edge {
 int uni[MAXLEN];
 edge arr[MAXLEN];
 
-int getuni(int a){
+int getuni(int a){                      // 并查集
     int root = a, t;
     while(uni[a] != a)
         a = uni[a];
-    while(uni[root] != root){
+    while(uni[root] != root){           // 路径压缩
         t = uni[root];
         uni[root] = a;
         root = t;
@@ -42,13 +42,13 @@ bool duplicate(const int &a, const int &b){
 int kruskal(int n, int m){
     int ans = 0, e = 0;
     int u, v;
-    sort(arr, arr+n);
+    sort(arr, arr+n);               // 边权排序，从最短的开始取
     for(int i = 0;i < n;i++){
         if(i > 0 && duplicate(i-1, i))
             continue;
         u = getuni(arr[i].u);
         v = getuni(arr[i].v);
-        if(u != v){
+        if(u != v){                 // 判断最短边两端点是否已连接
             uni[v] = u;
             ans += arr[i].w;
             e++;
