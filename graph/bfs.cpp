@@ -18,7 +18,7 @@ int bfs(){
     int u, g1, g2, g = 0;
     vector<int> neigh;
     map<int,vector<int> >::iterator it = graph.begin();
-    for(;it != graph.end();it++){
+    for(;it != graph.end();it++){       // 二分图不应定连通，可能有几个部分，因此累积计数
         queue<int> q;
         u = it->first;
         if(color[u] != 0)
@@ -30,17 +30,17 @@ int bfs(){
             q.pop();
             neigh = graph[u];
             if(color[u] == 0){
-                color[u] = 1;
-                g1++;
+                color[u] = 1;           // 默认染色为 1
+                g1++;                   // 染色 1 计数加 1
             }
             for(int i = 0;i < neigh.size();i++){
-                if(color[neigh[i]] == 0){
+                if(color[neigh[i]] == 0){           // 未染色的直接染不同色，并对对应计数加 1
                     color[neigh[i]] = color[u]==1?2:1;
                     if(color[neigh[i]] == 1)    g1++;
                     else    g2++;
                     q.push(neigh[i]);
                 }
-                else if(color[neigh[i]] == color[u])
+                else if(color[neigh[i]] == color[u])    // 相连节点染色相同，说明不是二分，返回失败
                     return -1;
             }
         }

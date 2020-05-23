@@ -21,7 +21,7 @@ int getParent(const int &a){
     int root = a, p = a, t;
     while(root != parent[root])
         root = parent[root];
-    while(p != parent[p]){
+    while(p != parent[p]){          // 路径压缩
         t = parent[p];
         parent[p] = root;
         p = t;

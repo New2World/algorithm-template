@@ -31,7 +31,7 @@ void dijkstra(int s, int n){
     _edge e;
     q.push(_edge(s, 0));
     while(!q.empty()){
-        e = q.top();
+        e = q.top();            // 所有 dis 中距离最短的节点
         q.pop();
         v = e.v;
         if(vis[v])  continue;
