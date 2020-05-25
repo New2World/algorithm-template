@@ -13,30 +13,34 @@ Algorithms for solving ACM/ICPC problems. Instead of writing some templates, whi
         - select sort
         - bubble sort
         - shell sort
-    - [x] union set
-    - [x] leftist heap
     - [x] prime
+    - [x] big integer
+    - [x] union set
     - [x] ST for RMQ
+    - [x] leftist heap
+    - [ ] Fibonacci heap
 - tree
     - [x] AVL tree
     - [x] splay tree
     - [x] segment tree
     - [x] binary indexed tree
+    - [x] LCA problem
     - [ ] red-black tree (hard to implement, pending...)
 - graph
     - [x] BFS / DFS
-    - [ ] shortest path
-        - Dijkstra
-        - SPFA
+    - [x] single source shortest path
+        - Dijkstra (non-negative weights)
+        - Bellman-Ford / SPFA (negative weights)
     - [ ] maximum flow
-        - Ford-Fulkerson
-        - Dinic
         - SAP
+        - Dinic
+        - Ford-Fulkerson
     - [x] minimum spanning tree
         - Kruskal (sparse)
         - Prim (dense)
     - [x] maximal matching (Hungary)
-    - [ ] topology sort
+    - [x] topology sort
+    - [x] Tarjan
 - string
     - [x] matching
         - KMP
