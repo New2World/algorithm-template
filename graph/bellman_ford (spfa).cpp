@@ -6,16 +6,29 @@
 
 #include <bits/stdc++.h>
 
-#define MAXLEN 500005
+#define MAXV 2005
+#define MAXE 6005
 #define inf 0x3f3f3f3f
 
 using namespace std;
 
-vector<pair<int,int> > graph[MAXLEN];
-int dis[MAXLEN], cnt[MAXLEN];
-bool vis[MAXLEN];
+struct _edge {
+    int v, w, next;
+    _edge(){}
+    _edge(int v, int w, int next):v(v), w(w), next(next){}
+};
+int edges, n;
+int head[MAXV];
+int dis[MAXV], cnt[MAXV];
+bool vis[MAXV];
+_edge edge[MAXE];
 
-bool bellmanford(int s, int n){
+void addedge(int u, int v, int w){
+    edge[edges] = _edge(v, w, head[u]);
+    head[u] = edges++;
+}
+
+bool spfa(int s, int n){        // TODO: SFL & LLL
     int u, v, w;
     queue<int> q;
     dis[s] = 0;
@@ -25,9 +38,9 @@ bool bellmanford(int s, int n){
         q.pop();
         vis[u] = false;
         cnt[u]++;
-        for(int i = 0;i < graph[u].size();i++){
-            v = graph[u][i].first;
-            w = graph[u][i].second;
+        for(int i = head[u];i >= 0;i = edge[i].next){
+            v = edge[i].v;
+            w = edge[i].w;
             if(dis[v] > dis[u] + w){
                 dis[v] = dis[u] + w;
                 if(cnt[v] >= n) return false;
@@ -45,23 +58,24 @@ int main(){
     #ifndef ONLINE_JUDGE
     freopen("test.txt", "r", stdin);
     #endif
-    int T, n, m, u, v, w;
+    int T, m, u, v, w;
     scanf("%d", &T);
     while(T--){
         scanf("%d %d", &n, &m);
         for(int i = 1;i <= n;i++){
-            graph[i].clear();
             vis[i] = false;
             dis[i] = inf;
+            head[i] = -1;
             cnt[i] = 0;
         }
+        edges = 0;
         for(int i = 0;i < m;i++){
             scanf("%d %d %d", &u, &v, &w);
-            graph[u].push_back(make_pair(v, w));
+            addedge(u, v, w);
             if(w >= 0)
-                graph[v].push_back(make_pair(u, w));
+                addedge(v, u, w);
         }
-        printf(bellmanford(1, n)?"NO\n":"YES\n");
+        printf(spfa(1, n)?"NO\n":"YES\n");
     }
     return 0;
 }

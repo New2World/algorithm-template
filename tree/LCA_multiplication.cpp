@@ -6,14 +6,32 @@
 
 #include <bits/stdc++.h>
 
-#define MAXLEN 500005
+#define MAXV 500005
+#define MAXE 1000005
 #define inf 0x3f3f3f3f
 
 using namespace std;
 
-vector<int> graph[MAXLEN];
-int fa[MAXLEN][20], dp[MAXLEN];
-bool vis[MAXLEN];
+struct _edge {
+    int v, next;
+    _edge(){}
+    _edge(int v, int next):v(v), next(next){}
+};
+int edges, n;
+int head[MAXV];
+int fa[MAXV][20], dp[MAXV];
+bool vis[MAXV];
+_edge edge[MAXE];
+
+void init(){
+    for(int i = 1;i <= n;i++)
+        head[i] = -1;
+}
+
+void addedge(int u, int v){
+    edge[edges] = _edge(v, head[u]);
+    head[u] = edges++;
+}
 
 int getfa(int u, int d){
     if(d == 0)  return u;
@@ -27,8 +45,8 @@ int dfs(int u, int d){
     vis[u] = true;
     for(int i = 1;(1<<i) < d;i++)
         fa[u][i] = fa[fa[u][i-1]][i-1];
-    for(int i = 0;i < graph[u].size();i++){
-        v = graph[u][i];
+    for(int i = head[u];i >= 0;i = edge[i].next){
+        v = edge[i].v;
         if(vis[v])  continue;
         fa[v][0] = u;
         mxd = max(dfs(v, d+1), mxd);
@@ -53,15 +71,14 @@ int main(){
     #ifndef ONLINE_JUDGE
     freopen("test.txt", "r", stdin);
     #endif
-    int r, n, q, u, v, d;
+    int r, q, u, v, d;
     while(~scanf("%d %d %d", &n, &q, &r)){
-        for(int i = 0;i < n;i++)
-            graph[i].clear();
+        init();
         memset(vis, false, sizeof(vis));
         for(int i = 0;i < n-1;i++){
             scanf("%d %d", &u, &v);
-            graph[u].push_back(v);
-            graph[v].push_back(u);
+            addedge(u, v);
+            addedge(v, u);
         }
         d = dfs(r, 1);
         for(int i = 0;i < q;i++){

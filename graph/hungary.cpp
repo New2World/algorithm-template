@@ -6,19 +6,36 @@ HDU 2063 - 过山车
 
 #include <bits/stdc++.h>
 
-#define MAXLEN 505
+#define MAXV 505
+#define MAXE 1005
 
 using namespace std;
 
-int match[MAXLEN];
-int graph[MAXLEN][MAXLEN];
-int neigh[MAXLEN];
-bool check[MAXLEN];
+struct _edge {
+    int v, next;
+    _edge(){}
+    _edge(int v, int next):v(v), next(next){}
+};
+int edges;
+int match[MAXV];
+int head[MAXV];
+bool check[MAXV];
+_edge edge[MAXE];
+
+void init(int n){
+    for(int i = 1;i <= n;i++)
+        head[i] = -1;
+}
+
+void addedge(int u, int v){
+    edge[edges] = _edge(v, head[u]);
+    head[u] = edges++;
+}
 
 bool bipart(int u){
     int v;
-    for(int i = 0;i < neigh[u];i++){
-        v = graph[u][i];
+    for(int i = head[u];i >= 0;i = edge[i].next){
+        v = edge[i].v;
         if(!check[v]){
             check[v] = true;                            // 标记为已考察
             if(match[v] == 0 || bipart(match[v])){      // 当前点还没有匹配过 或 匹配过但可以换一个匹配对象
@@ -48,11 +65,12 @@ int main(){
     #endif
     int k, m, n, u, v;
     while(~scanf("%d %d %d", &k, &m, &n) && k){
-        memset(neigh, 0, sizeof(neigh));
+        init(n);
+        edges = 0;
         memset(match, 0, sizeof(match));
         for(int i = 0;i < k;i++){
             scanf("%d %d", &u, &v);
-            graph[u][neigh[u]++] = v;
+            addedge(u, v);
         }
         printf("%d\n", getans(m));
     }

@@ -6,39 +6,54 @@ HDU 1879 - 继续畅通工程
 
 #include <bits/stdc++.h>
 
-#define MAXLEN 105
+#define MAXV 105
+#define MAXE 20005
 
 using namespace std;
 
-typedef struct _edge {
+struct _edge {
     int v, w;
+    int next;
     _edge(){}
-    _edge(int v, int w):v(v), w(w){}
+    _edge(int v, int w, int next):v(v), w(w), next(next){}
     inline int operator < (const struct _edge &c) const {
         return w > c.w;
     }
-} edge;
+};
+int edges, n;
+int neigh[MAXV], head[MAXV];
+_edge edge[MAXE];
 
-int graph[MAXLEN][MAXLEN][2];
+void init(){
+    for(int i = 1;i <= n;i++)
+        head[i] = -1;
+}
 
-int prim(int n){
+void addedge(int u, int v, int w){
+    edge[edges] = _edge(v, w, head[u]);
+    head[u] = edges++;
+}
+
+int prim(){
     set<int> mst;
-    priority_queue<edge> pq;
-    edge e;
-    int ans = 0;
+    priority_queue<_edge> pq;
+    _edge t;
+    int ans = 0, v, w;
     mst.insert(1);
-    for(int i = 0;i < neigh[1];i++)
-        pq.push(edge(graph[1][i][0], graph[1][i][1]));
+    for(int i = head[1];i >= 0;i = edge[i].next)
+        pq.push(edge[i]);
     for(int i = 0;!pq.empty() && mst.size() < n;i++){
-        e = pq.top();                       // 取目前 fringe 中最短的节点
+        t = pq.top();                       // 取目前 fringe 中最短的节点
         pq.pop();
-        if(mst.find(e.v) != mst.end())
+        v = t.v;
+        w = t.w;
+        if(mst.find(v) != mst.end())
             continue;
-        mst.insert(e.v);
-        ans += e.w;
-        for(int j = 0;j < neigh[e.v];j++)
-            if(mst.find(graph[e.v][j][0]) == mst.end())
-                pq.push(edge(graph[e.v][j][0], graph[e.v][j][1]));      // 每次加入为加入过的最近的节点
+        mst.insert(v);
+        ans += w;
+        for(int j = head[v];j >= 0;j = edge[j].next)
+            if(mst.find(edge[j].v) == mst.end())
+                pq.push(edge[j]);                 // 每次加入为加入过的最近的节点
     }
     return ans;
 }
@@ -47,19 +62,18 @@ int main(){
     #ifndef ONLINE_JUDGE
     freopen("test.txt", "r", stdin);
     #endif
-    int n, m, u, v, w, c;
+    int m, u, v, w, c;
     while(~scanf("%d", &n) && n){
         m = n*(n-1)/2;
-        memset(neigh, 0, sizeof(neigh));
+        init();
+        edges = 0;
         for(int i = 0;i < m;i++){
             scanf("%d %d %d %d", &u, &v, &w, &c);
             if(c)   w = 0;                  // 将已连接的节点间的 cost 更改为 0 即可
-            graph[u][neigh[u]][0] = v;
-            graph[u][neigh[u]++][1] = w;
-            graph[v][neigh[v]][0] = u;
-            graph[v][neigh[v]++][1] = w;
+            addedge(u, v, w);
+            addedge(v, u, w);
         }
-        printf("%d\n", prim(n));
+        printf("%d\n", prim());
     }
     return 0;
 }

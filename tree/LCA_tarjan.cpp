@@ -6,15 +6,34 @@ HDU 2586 - How Far Away?
 
 #include <bits/stdc++.h>
 
-#define MAXLEN 40005
+#define MAXV 40005
+#define MAXE 80005
 #define inf 0x3f3f3f3f
 
 using namespace std;
 
-vector<pair<int,int> > graph[MAXLEN], query[MAXLEN];
-int fa[MAXLEN], dis[MAXLEN];
+struct _edge {
+    int v, w, next;
+    _edge(){}
+    _edge(int v, int w, int next):v(v), w(w), next(next){}
+};
+vector<pair<int,int> > query[MAXV];
+int edges, n;
+int fa[MAXV], dis[MAXV];
+int head[MAXV];
 int ans[200];
-bool vis[MAXLEN];
+bool vis[MAXV];
+_edge edge[MAXE];
+
+void init(){
+    for(int i = 1;i <= n;i++)
+        head[i] = -1;
+}
+
+void addedge(int u, int v, int w){
+    edge[edges] = _edge(v, w, head[u]);
+    head[u] = edges++;
+}
 
 int getfa(int x){
     int y = x, t;
@@ -40,9 +59,9 @@ void dfs(int u){
         f = getfa(v);
         ans[w] = dis[u] + dis[v] - 2 * dis[f];
     }
-    for(int i = 0;i < graph[u].size();i++){
-        v = graph[u][i].first;
-        w = graph[u][i].second;
+    for(int i = head[u];i >= 0;i = edge[i].next){
+        v = edge[i].v;
+        w = edge[i].w;
         if(vis[v])  continue;
         dis[v] = dis[u] + w;
         dfs(v);
@@ -58,16 +77,17 @@ int main(){
     scanf("%d", &T);
     while(T--){
         scanf("%d %d", &n, &q);
-        for(int i = 0;i < n;i++){
-            graph[i].clear();
+        edges = 0;
+        for(int i = 1;i <= n;i++){
             query[i].clear();
+            head[i] = -1;
             dis[i] = 0;
             fa[i] = i;
         }
         for(int i = 0;i < n-1;i++){
             scanf("%d %d %d", &u, &v, &w);
-            graph[u].push_back(make_pair(v, w));
-            graph[v].push_back(make_pair(u, w));
+            addedge(u, v, w);
+            addedge(v, u, w);
         }
         for(int i = 0;i < q;i++){
             scanf("%d %d", &u, &v);
