@@ -44,7 +44,7 @@ void tarjan(int n, int u, int &cnt, int &ans){
             tarjan(n, v, cnt, ans);
             low[u] = min(low[u], low[v]);
         }
-        else if(vis[v])
+        else if(vis[v])    // visited and NOT in other SCC
             low[u] = min(low[u], dfn[v]);
     }
     if(low[u] == dfn[u]){
@@ -52,7 +52,7 @@ void tarjan(int n, int u, int &cnt, int &ans){
         do{
             v = st.top();
             st.pop();
-            vis[v] = false;
+            vis[v] = false;    // dfn[v] still holds the index, so with non-zero dfn and false visit mean node v is already in a SCC
         }while(v != u);
     }
 }
