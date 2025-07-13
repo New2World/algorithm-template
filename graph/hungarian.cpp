@@ -2,7 +2,7 @@
 
 HDU 2063 - 过山车
 
-A more interesting explanation of Hungarian algorithm
+A more interesting explanation of Hungarian algorithm: https://blog.csdn.net/dark_scope/article/details/8880547
 
 */
 
