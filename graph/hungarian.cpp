@@ -2,6 +2,8 @@
 
 HDU 2063 - 过山车
 
+A more interesting explanation of Hungarian algorithm
+
 */
 
 #include <bits/stdc++.h>
