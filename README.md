@@ -38,7 +38,7 @@ Algorithms for solving ACM/ICPC problems. Instead of writing some templates, whi
     - [x] minimum spanning tree
         - Kruskal (sparse)
         - Prim (dense)
-    - [x] maximal matching (Hungary)
+    - [x] maximal matching (Hungarian)
     - [x] topology sort
     - [x] Tarjan
 - string
